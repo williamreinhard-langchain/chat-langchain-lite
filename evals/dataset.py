@@ -26,13 +26,20 @@ evaluated in CI.
 from langsmith import Client
 from langsmith.schemas import DataType
 
+import logging
 import os
 
 # Presenter suffix — scopes every dataset/project/Context-Hub-repo name so
 # multiple demoers in the same LangSmith workspace don't collide. Set via
 # DEMO_PRESENTER env var (local `.env`) or GitHub repository variable
 # (CI). Defaults to "robert" if not set.
-DEMO_PRESENTER = os.getenv("DEMO_PRESENTER", "robert").strip() or "robert"
+_presenter_env = os.getenv("DEMO_PRESENTER", "").strip()
+if not _presenter_env:
+    logging.getLogger(__name__).warning(
+        "DEMO_PRESENTER is unset; defaulting to 'robert'. Context Hub repo, "
+        "dataset, and project names will be scoped to that presenter."
+    )
+DEMO_PRESENTER = _presenter_env or "robert"
 
 DATASET_NAME = f"chat-lc-lite-scope-{DEMO_PRESENTER}"
 TOOL_ADHERENCE_DATASET_NAME = f"chat-lc-lite-tools-{DEMO_PRESENTER}"

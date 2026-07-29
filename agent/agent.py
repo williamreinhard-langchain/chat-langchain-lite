@@ -28,6 +28,11 @@ def _model_id() -> str:
 
 
 def build_agent():
+    if not SYSTEM_PROMPT or not SYSTEM_PROMPT.strip():
+        raise RuntimeError(
+            f"System prompt is empty — Context Hub repo {CONTEXT_HUB_REPO!r} "
+            "could not be pulled. Run `python -m scripts.setup` to seed it."
+        )
     return create_agent(
         model=ChatAnthropic(model=_model_id(), max_tokens=300),
         tools=TOOLS,
