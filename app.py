@@ -196,6 +196,8 @@ if "messages" not in st.session_state:
     st.session_state.messages = []
 if "thread_id" not in st.session_state:
     st.session_state.thread_id = str(uuid.uuid4())
+if "user_id" not in st.session_state:
+    st.session_state.user_id = str(uuid.uuid4())
 
 # ── Empty state with prebuilt cards ───────────────────────────────────────
 if not st.session_state.messages:
@@ -253,7 +255,11 @@ if user_input:
         response = ""
         try:
             from agent.agent import stream_agent
-            for chunk in stream_agent(question=user_input, thread_id=st.session_state.thread_id):
+            for chunk in stream_agent(
+                question=user_input,
+                thread_id=st.session_state.thread_id,
+                user_id=st.session_state.user_id,
+            ):
                 response += chunk
                 placeholder.markdown(response)
         except Exception as e:
