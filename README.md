@@ -172,9 +172,10 @@ CI runs evals on both the base branch (creating the "before" experiment) and the
 
 ```
 context/
-└── __init__.py       # get_prompt() — pulls the agent's system prompt from
-                      # LangSmith Context Hub at runtime. The prompt content
-                      # lives in the hub, not this repo (Bugs 1 & 5 are fixed
+└── __init__.py       # get_prompt() — pulls the agent's system prompt and the
+                      # commit hash it came from out of LangSmith Context Hub
+                      # at runtime. The prompt content lives in the hub, not
+                      # this repo (Bugs 1 & 5 are fixed
                       # in the Context Hub UI, not via code PR).
 
 agent/

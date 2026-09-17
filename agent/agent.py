@@ -1,4 +1,5 @@
 import os
+import uuid
 
 from langchain.agents import create_agent
 from langchain_anthropic import ChatAnthropic
@@ -15,16 +16,22 @@ from utils.streaming import iter_text
 # AGENTS.md is the agent's system prompt — pulled fresh from LangSmith
 # Context Hub at module import. The content lives in Context Hub, not in
 # this repo. Edit the prompt in the Context Hub UI.
-SYSTEM_PROMPT = get_prompt()
+SYSTEM_PROMPT, PROMPT_COMMIT = get_prompt()
 
 # Override with CHAT_LANGCHAIN_LITE_MODEL env var — used by setup.py to seed
 # baseline experiments against a more expensive model (Sonnet) for the
 # demo's cost/latency comparison.
 _DEFAULT_MODEL = "claude-haiku-4-5-20251001"
 
+_DEFAULT_ENV = "development"
+
 
 def _model_id() -> str:
     return os.getenv("CHAT_LANGCHAIN_LITE_MODEL") or _DEFAULT_MODEL
+
+
+def _environment() -> str:
+    return os.getenv("CHAT_LANGCHAIN_LITE_ENV") or _DEFAULT_ENV
 
 
 def build_agent():
@@ -38,9 +45,15 @@ def build_agent():
 
 
 def _config(thread_id: str | None = None) -> RunnableConfig:
-    metadata = {"demo": "true", "demo_type": "chat-lc-lite", "model": _model_id()}
-    if thread_id:
-        metadata["thread_id"] = thread_id
+    metadata = {
+        "demo": "true",
+        "demo_type": "chat-lc-lite",
+        "model": _model_id(),
+        "environment": _environment(),
+        # Always set so single-turn callers still land in the Threads view.
+        "thread_id": thread_id or str(uuid.uuid4()),
+        "prompt_commit": PROMPT_COMMIT,
+    }
     return RunnableConfig(
         run_name="chat-lc-lite-demo",
         metadata=metadata,
