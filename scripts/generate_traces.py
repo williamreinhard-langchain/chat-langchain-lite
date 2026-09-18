@@ -76,12 +76,19 @@ def main():
     for thread in THREADS:
         thread_id = str(uuid.uuid4())
         print(f"Thread: {thread['name']} (id: {thread_id[:8]}...)")
+        history = []
         for j, turn in enumerate(thread["turns"]):
             question = turn["question"]
             print(f"  Turn {j+1}: {question[:65]}...")
             try:
-                result = invoke_agent(question=question, thread_id=thread_id)
+                result = invoke_agent(
+                    question=question, thread_id=thread_id, history=history
+                )
                 response = result["output"]
+                history += [
+                    {"role": "user", "content": question},
+                    {"role": "assistant", "content": response},
+                ]
                 print(f"    → {response[:80].replace(chr(10), ' ')}{'...' if len(response) > 80 else ''}")
             except Exception as e:
                 print(f"    ERROR: {e}")

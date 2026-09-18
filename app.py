@@ -253,7 +253,14 @@ if user_input:
         response = ""
         try:
             from agent.agent import stream_agent
-            for chunk in stream_agent(question=user_input, thread_id=st.session_state.thread_id):
+            # messages[:-1] is the transcript before the turn just appended
+            # above, so the model sees prior turns instead of only the newest.
+            history = st.session_state.messages[:-1]
+            for chunk in stream_agent(
+                question=user_input,
+                thread_id=st.session_state.thread_id,
+                history=history,
+            ):
                 response += chunk
                 placeholder.markdown(response)
         except Exception as e:
